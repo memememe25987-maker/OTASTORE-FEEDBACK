@@ -1,9 +1,14 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
+
 <meta charset="UTF-8">
+
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
 <title>OTA STORE Feedback</title>
+
 
 <style>
 
@@ -22,6 +27,7 @@ body{
 
 h1,h2{
     color:#00ccff;
+
     text-shadow:
         0 0 8px #00ccff,
         0 0 18px #00ccff,
@@ -31,15 +37,21 @@ h1,h2{
 textarea{
     width:100%;
     height:150px;
+
     background:#000;
     color:#fff;
+
     border:3px solid #00ccff;
     border-radius:12px;
+
     padding:12px;
+
     font-size:16px;
+
     resize:none;
     box-sizing:border-box;
     outline:none;
+
     box-shadow:0 0 18px #00ccff;
 }
 
@@ -49,53 +61,78 @@ textarea{
 
 button{
     width:100%;
+
     padding:14px;
     margin-top:20px;
+
     background:#00ccff;
     color:#000;
+
     border:none;
     border-radius:10px;
+
     font-size:18px;
     font-weight:bold;
+
     cursor:pointer;
+
     box-shadow:0 0 20px #00ccff;
+
     transition:.25s;
 }
 
 button:hover{
+
     box-shadow:0 0 35px #00ccff;
+
     transform:scale(1.03);
 }
 
 button:disabled{
+
     background:#333;
     color:#888;
+
     box-shadow:none;
+
     cursor:not-allowed;
+
     transform:none;
 }
 
 #cooldown{
+
     display:none;
+
     color:#ff3333;
+
     text-align:center;
+
     font-weight:bold;
+
     margin-top:15px;
+
     text-shadow:
         0 0 8px #ff3333,
         0 0 18px #ff3333;
 }
 
 </style>
+
 </head>
+
 
 <body>
 
+
 <div class="container">
+
 
 <h1>OTA STORE</h1>
 
+
 <h2>Feedback</h2>
+
 
 <textarea
     id="feedback"
@@ -103,27 +140,51 @@ button:disabled{
     placeholder="Type your feedback..."
 ></textarea>
 
+
 <div class="counter">
+
     <span id="count">0</span>/150
+
 </div>
 
-<button id="submitBtn" onclick="send()">Submit</button>
+
+<button
+    id="submitBtn"
+    onclick="send()"
+>
+    Submit
+</button>
+
 
 <div id="cooldown">
-    Cooldown: <span id="timer">2:00</span>
-</div>
+
+    Cooldown:
+    <span id="timer">2:00</span>
 
 </div>
+
+
+</div>
+
 
 
 <script>
+
 
 /* =========================================================
    TELEGRAM SETTINGS
    ========================================================= */
 
+/*
+   IMPORTANT:
+   Replace this with your NEW Telegram bot token
+   after regenerating the old one.
+*/
+
 const BOT_TOKEN="8534750967:AAGp-WLDaDTx3i5bRQ30uf8-9Atz9r1opOo";
+
 const CHAT_ID="7965256318";
+
 
 
 /* =========================================================
@@ -205,6 +266,7 @@ const badWords = [
     "dammit",
     "hell",
 
+
     /* ================= SLURS ================= */
 
     "nigga",
@@ -221,6 +283,7 @@ const badWords = [
 
     "dyke",
     "tranny",
+
 
     /* ================= ARABIC ================= */
 
@@ -296,6 +359,7 @@ const badWords = [
     "سحاق",
     "سحاقية",
 
+
     /* ================= FAMILY INSULTS ================= */
 
     "ابوك",
@@ -313,6 +377,7 @@ const badWords = [
     "اخوك",
     "أخوك",
 
+
     /* ================= CURSING ================= */
 
     "يلعن",
@@ -328,6 +393,7 @@ const badWords = [
     "يلعن امك",
     "العن ابوك",
     "العن امك",
+
 
     /* ================= GROSS INSULTS ================= */
 
@@ -371,20 +437,9 @@ const badWords = [
 ];
 
 
+
 /* =========================================================
    UNICODE DIGIT SYSTEM
-   =========================================================
-
-   This supports decimal digits from many writing systems.
-
-   We store the Unicode code-point of ZERO for each
-   decimal digit system.
-
-   Then:
-       ZERO + 6 = digit 6
-       ZERO + 7 = digit 7
-
-   This makes the filter work with many languages.
    ========================================================= */
 
 const unicodeZeroPoints = [
@@ -426,7 +481,9 @@ const unicodeZeroPoints = [
     0xAA50, // Cham
     0xABF0, // Meetei Mayek
     0xFF10  // Fullwidth
+
 ];
+
 
 
 /* =========================================================
@@ -441,19 +498,23 @@ function getUnicodeDigitValue(char){
 
     const code=char.codePointAt(0);
 
-    /*
-       First check normal Unicode decimal digit blocks.
-    */
-
     for(const zero of unicodeZeroPoints){
 
-        if(code>=zero && code<=zero+9){
+        if(
+            code>=zero &&
+            code<=zero+9
+        ){
+
             return code-zero;
+
         }
+
     }
 
     return null;
+
 }
+
 
 
 /* =========================================================
@@ -464,38 +525,71 @@ function normalizeText(text){
 
     let result=text;
 
+
     /*
-       NFKC converts many Unicode visual variants:
-
-       ６ → 6
-       ⁶ → 6
-       ₆ → 6
-       ⑥ → 6
-       ❻ → 6
-       etc.
-
-       This is extremely important for Unicode tricks.
+       Unicode normalization
     */
 
     try{
+
         result=result.normalize("NFKC");
+
     }catch(e){}
 
 
-    result=result
-        .toLowerCase()
+    /*
+       Lowercase
+    */
 
-        /*
-           Arabic letters
-        */
+    result=result.toLowerCase();
+
+
+    /* =====================================================
+       NUMBER WORDS
+       =====================================================
+
+       Arabic:
+
+       ست
+       ستة
+       سبع
+       سبعة
+
+       English:
+
+       six
+       seven
+       ===================================================== */
+
+
+    result=result
+
+        .replace(/ستة/g,"6")
+        .replace(/ست/g,"6")
+
+        .replace(/سبعة/g,"7")
+        .replace(/سبع/g,"7")
+
+        .replace(/six/g,"6")
+        .replace(/seven/g,"7");
+
+
+    /*
+       Arabic letters
+    */
+
+    result=result
 
         .replace(/[أإآٱ]/g,"ا")
         .replace(/ى/g,"ي")
-        .replace(/ة/g,"ه")
+        .replace(/ة/g,"ه");
 
-        /*
-           Arabic/Persian digits
-        */
+
+    /*
+       Arabic / Persian digits
+    */
+
+    result=result
 
         .replace(/٠/g,"0")
         .replace(/١/g,"1")
@@ -517,64 +611,79 @@ function normalizeText(text){
         .replace(/۶/g,"6")
         .replace(/۷/g,"7")
         .replace(/۸/g,"8")
-        .replace(/۹/g,"9")
-
-        /*
-           Arabic diacritics
-        */
-
-        .replace(/[\u064B-\u065F\u0670]/g,"")
-
-        /*
-           Zero-width / invisible characters
-        */
-
-        .replace(/[\u200B-\u200F\u202A-\u202E\u2060-\u206F\uFEFF]/g,"")
-
-        /*
-           Tatweel
-        */
-
-        .replace(/ـ/g,"")
-
-        /*
-           Remove common separators.
-
-           This makes:
-
-           f-u-c-k
-           f.u.c.k
-           f/u/c/k
-           f*u*c*k
-
-           behave like:
-
-           fuck
-        */
-
-        .replace(/[\s._\-|/\\*+~=!?@#$%^&()[\]{}<>:;"',،؛]/g,"");
+        .replace(/۹/g,"9");
 
 
     /*
-       Convert decimal digits from other scripts
-       that NFKC did not convert.
+       Arabic diacritics
+    */
+
+    result=result.replace(
+        /[\u064B-\u065F\u0670]/g,
+        ""
+    );
+
+
+    /*
+       Zero-width / invisible characters
+    */
+
+    result=result.replace(
+        /[\u200B-\u200F\u202A-\u202E\u2060-\u206F\uFEFF]/g,
+        ""
+    );
+
+
+    /*
+       Tatweel
+    */
+
+    result=result.replace(
+        /ـ/g,
+        ""
+    );
+
+
+    /*
+       Remove common separators
+    */
+
+    result=result.replace(
+        /[\s._\-|/\\*+~=!?@#$%^&()[\]{}<>:;"',،؛]/g,
+        ""
+    );
+
+
+    /*
+       Convert decimal digits from other
+       Unicode writing systems.
     */
 
     let output="";
+
 
     for(const char of result){
 
         const value=getUnicodeDigitValue(char);
 
+
         if(value!==null){
+
             output+=String(value);
+
         }else{
+
             output+=char;
+
         }
+
     }
 
+
     return output;
+
 }
+
 
 
 /* =========================================================
@@ -583,137 +692,194 @@ function normalizeText(text){
 
 function containsBadWord(text){
 
-    const normalizedText=normalizeText(text);
+    const normalizedText=
+        normalizeText(text);
+
 
     for(const word of badWords){
 
-        const normalizedWord=normalizeText(word);
+        const normalizedWord=
+            normalizeText(word);
+
 
         if(
             normalizedWord.length>=3 &&
             normalizedText.includes(normalizedWord)
         ){
+
             return true;
+
         }
+
     }
 
+
     return false;
+
 }
+
 
 
 /* =========================================================
    6 / 7 SECURITY FILTER
    =========================================================
 
-   This is the important part.
+   Detects:
 
-   It detects:
+   6 + 7
+   ست + سبع
+   ستة + سبعة
+   six + seven
+   ٦ + ٧
+   ６ + ７
 
-   6...7
-   7...6
+   Also detects them when characters are
+   between the numbers.
 
-   regardless of what is between them.
-
-   Examples:
+   Example:
 
    6abc7
-   6🙂7
-   6🔥hello🔥7
-   ٦abc٧
-   ⁶abc⁷
-   ₆abc₇
-   ⑥abc⑦
-   ６abc７
+   ستة hello سبعة
+   six 🔥 seven
 
-   All become:
-
-   6...7
-
-   and are blocked.
    ========================================================= */
 
 function containsSixSevenCombination(text){
 
-    const normalized=normalizeText(text);
+    const normalized=
+        normalizeText(text);
 
-    const has6=normalized.includes("6");
-    const has7=normalized.includes("7");
+
+    const has6=
+        normalized.includes("6");
+
+
+    const has7=
+        normalized.includes("7");
+
 
     /*
-       If both exist anywhere in the same message,
-       block it.
-
-       It doesn't matter which one comes first.
+       If both exist anywhere in the same
+       message, block it.
     */
 
     if(has6 && has7){
+
         return true;
+
     }
 
+
     return false;
+
 }
+
 
 
 /* =========================================================
    PREVIOUS MESSAGE 6 / 7 CHECK
    ========================================================= */
 
-const LAST_DIGIT_KEY="ota_last_6_7_digit";
+const LAST_DIGIT_KEY=
+    "ota_last_6_7_digit";
+
 
 
 function getSixSevenState(text){
 
-    const normalized=normalizeText(text);
+    const normalized=
+        normalizeText(text);
 
-    const has6=normalized.includes("6");
-    const has7=normalized.includes("7");
 
-    if(has6 && !has7){
+    const has6=
+        normalized.includes("6");
+
+
+    const has7=
+        normalized.includes("7");
+
+
+    if(
+        has6 &&
+        !has7
+    ){
+
         return "6";
+
     }
 
-    if(has7 && !has6){
+
+    if(
+        has7 &&
+        !has6
+    ){
+
         return "7";
+
     }
 
-    /*
-       If both exist, the message should already be blocked.
-    */
 
     return null;
+
 }
+
 
 
 /* =========================================================
    ELEMENTS
    ========================================================= */
 
-const box=document.getElementById("feedback");
-const submitBtn=document.getElementById("submitBtn");
-const cooldownBox=document.getElementById("cooldown");
-const timer=document.getElementById("timer");
-const count=document.getElementById("count");
+const box=
+    document.getElementById("feedback");
+
+
+const submitBtn=
+    document.getElementById("submitBtn");
+
+
+const cooldownBox=
+    document.getElementById("cooldown");
+
+
+const timer=
+    document.getElementById("timer");
+
+
+const count=
+    document.getElementById("count");
+
 
 
 /* =========================================================
    STORAGE SETTINGS
    ========================================================= */
 
-const FIRST_MESSAGE_KEY="ota_first_message_time";
-const COOLDOWN_KEY="ota_cooldown_until";
+const FIRST_MESSAGE_KEY=
+    "ota_first_message_time";
+
+
+const COOLDOWN_KEY=
+    "ota_cooldown_until";
+
 
 let countdownInterval=null;
+
 
 
 /* =========================================================
    CHARACTER COUNTER
    ========================================================= */
 
-box.addEventListener("input",()=>{
+box.addEventListener(
+    "input",
+    ()=>{
 
-    count.innerText=box.value.length;
+        count.innerText=
+            box.value.length;
 
-});
+    }
+);
+
 
 
 /* =========================================================
@@ -722,17 +888,34 @@ box.addEventListener("input",()=>{
 
 function formatTime(milliseconds){
 
-    let totalSeconds=Math.ceil(milliseconds/1000);
+    let totalSeconds=
+        Math.ceil(
+            milliseconds/1000
+        );
 
-    let minutes=Math.floor(totalSeconds/60);
-    let seconds=totalSeconds%60;
+
+    let minutes=
+        Math.floor(
+            totalSeconds/60
+        );
+
+
+    let seconds=
+        totalSeconds%60;
+
 
     return (
+
         minutes+
         ":"+
-        seconds.toString().padStart(2,"0")
+        seconds
+            .toString()
+            .padStart(2,"0")
+
     );
+
 }
+
 
 
 /* =========================================================
@@ -741,39 +924,76 @@ function formatTime(milliseconds){
 
 function startCooldown(until){
 
-    clearInterval(countdownInterval);
+    clearInterval(
+        countdownInterval
+    );
 
-    cooldownBox.style.display="block";
-    submitBtn.disabled=true;
+
+    cooldownBox.style.display=
+        "block";
+
+
+    submitBtn.disabled=
+        true;
+
 
     function update(){
 
-        const remaining=until-Date.now();
+        const remaining=
+            until-Date.now();
+
 
         if(remaining<=0){
 
-            clearInterval(countdownInterval);
+            clearInterval(
+                countdownInterval
+            );
 
-            localStorage.removeItem(COOLDOWN_KEY);
-            localStorage.removeItem(FIRST_MESSAGE_KEY);
 
-            cooldownBox.style.display="none";
+            localStorage.removeItem(
+                COOLDOWN_KEY
+            );
 
-            submitBtn.disabled=false;
 
-            timer.innerText="2:00";
+            localStorage.removeItem(
+                FIRST_MESSAGE_KEY
+            );
+
+
+            cooldownBox.style.display=
+                "none";
+
+
+            submitBtn.disabled=
+                false;
+
+
+            timer.innerText=
+                "2:00";
+
 
             return;
+
         }
 
-        timer.innerText=formatTime(remaining);
+
+        timer.innerText=
+            formatTime(remaining);
 
     }
 
+
     update();
 
-    countdownInterval=setInterval(update,250);
+
+    countdownInterval=
+        setInterval(
+            update,
+            250
+        );
+
 }
+
 
 
 /* =========================================================
@@ -784,27 +1004,40 @@ function checkCooldown(){
 
     const cooldownUntil=
         Number(
-            localStorage.getItem(COOLDOWN_KEY)
+            localStorage.getItem(
+                COOLDOWN_KEY
+            )
         );
+
 
     if(
         cooldownUntil &&
         cooldownUntil>Date.now()
     ){
 
-        startCooldown(cooldownUntil);
+        startCooldown(
+            cooldownUntil
+        );
+
 
         return true;
+
     }
+
 
     if(cooldownUntil){
 
-        localStorage.removeItem(COOLDOWN_KEY);
+        localStorage.removeItem(
+            COOLDOWN_KEY
+        );
 
     }
 
+
     return false;
+
 }
+
 
 
 /* =========================================================
@@ -813,16 +1046,20 @@ function checkCooldown(){
 
 async function send(){
 
+
     /*
        Don't allow sending during cooldown.
     */
 
     if(checkCooldown()){
+
         return;
+
     }
 
 
-    let text=box.value.trim();
+    let text=
+        box.value.trim();
 
 
     /*
@@ -831,9 +1068,12 @@ async function send(){
 
     if(text===""){
 
-        alert("Please enter feedback.");
+        alert(
+            "Please enter feedback."
+        );
 
         return;
+
     }
 
 
@@ -841,13 +1081,16 @@ async function send(){
        6 / 7 SAME MESSAGE PROTECTION
        ===================================================== */
 
-    if(containsSixSevenCombination(text)){
+    if(
+        containsSixSevenCombination(text)
+    ){
 
         alert(
             "🚫 This message cannot be sent."
         );
 
         return;
+
     }
 
 
@@ -855,13 +1098,16 @@ async function send(){
        BAD WORD PROTECTION
        ===================================================== */
 
-    if(containsBadWord(text)){
+    if(
+        containsBadWord(text)
+    ){
 
         alert(
             "🚫Your message contains a prohibited word. Please remove it and try again🚫."
         );
 
         return;
+
     }
 
 
@@ -869,10 +1115,14 @@ async function send(){
        6 / 7 PREVIOUS MESSAGE PROTECTION
        ===================================================== */
 
-    const currentState=getSixSevenState(text);
+    const currentState=
+        getSixSevenState(text);
+
 
     const previousState=
-        localStorage.getItem(LAST_DIGIT_KEY);
+        localStorage.getItem(
+            LAST_DIGIT_KEY
+        );
 
 
     /*
@@ -888,34 +1138,29 @@ async function send(){
     */
 
     if(
+
         previousState &&
         currentState &&
         previousState!==currentState
+
     ){
 
         alert(
             "🚫 This message cannot be sent."
         );
 
+
         /*
            IMPORTANT:
 
            Do NOT change LAST_DIGIT_KEY.
 
-           This means if someone tries:
-
-           6
-           7 ❌
-           7 ❌
-           7 ❌
-           ...
-
-           the 7 stays blocked.
-
-           They cannot bypass it by repeatedly trying.
+           This prevents bypassing the filter
+           by repeatedly trying the opposite number.
         */
 
         return;
+
     }
 
 
@@ -923,34 +1168,45 @@ async function send(){
        Disable button while sending.
     */
 
-    submitBtn.disabled=true;
+    submitBtn.disabled=
+        true;
 
 
     try{
 
-        const response=await fetch(
-            `https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`,
-            {
-                method:"POST",
 
-                headers:{
-                    "Content-Type":"application/json"
-                },
+        const response=
+            await fetch(
 
-                body:JSON.stringify({
+                `https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`,
 
-                    chat_id:CHAT_ID,
+                {
 
-                    text:
-                        "📩 New Feedback\n\n"+
-                        text
+                    method:"POST",
 
-                })
-            }
-        );
+                    headers:{
+                        "Content-Type":
+                            "application/json"
+                    },
+
+                    body:JSON.stringify({
+
+                        chat_id:
+                            CHAT_ID,
+
+                        text:
+                            "📩 New Feedback\n\n"+
+                            text
+
+                    })
+
+                }
+
+            );
 
 
-        const result=await response.json();
+        const result=
+            await response.json();
 
 
         /*
@@ -958,13 +1214,16 @@ async function send(){
         */
 
         if(
+
             !response.ok ||
             !result.ok
+
         ){
 
             throw new Error(
                 "Telegram request failed."
             );
+
         }
 
 
@@ -979,24 +1238,24 @@ async function send(){
 
         box.value="";
 
-        count.innerText="0";
+
+        count.innerText=
+            "0";
 
 
         /*
            SAVE 6 / 7 STATE ONLY AFTER
            SUCCESSFUL TELEGRAM SEND.
-
-           This is important.
-
-           If a message fails to send,
-           it should NOT affect the next message.
         */
 
         if(currentState){
 
             localStorage.setItem(
+
                 LAST_DIGIT_KEY,
+
                 currentState
+
             );
 
         }
@@ -1006,30 +1265,39 @@ async function send(){
            NORMAL COOLDOWN SYSTEM
            ================================================= */
 
-        const now=Date.now();
+        const now=
+            Date.now();
+
 
         const firstMessageTime=
             Number(
+
                 localStorage.getItem(
                     FIRST_MESSAGE_KEY
                 )
+
             );
 
 
-        let triggerCooldown=false;
+        let triggerCooldown=
+            false;
 
 
         if(
+
             firstMessageTime &&
             now-firstMessageTime<=30000
+
         ){
 
-            triggerCooldown=true;
+            triggerCooldown=
+                true;
 
         }
 
 
         if(triggerCooldown){
+
 
             const cooldownUntil=
                 Date.now()+
@@ -1037,8 +1305,11 @@ async function send(){
 
 
             localStorage.setItem(
+
                 COOLDOWN_KEY,
+
                 cooldownUntil.toString()
+
             );
 
 
@@ -1051,30 +1322,41 @@ async function send(){
                 cooldownUntil
             );
 
+
         }else{
 
+
             localStorage.setItem(
+
                 FIRST_MESSAGE_KEY,
+
                 Date.now().toString()
+
             );
 
 
-            submitBtn.disabled=false;
+            submitBtn.disabled=
+                false;
 
 
             setTimeout(()=>{
 
+
                 const savedTime=
                     Number(
+
                         localStorage.getItem(
                             FIRST_MESSAGE_KEY
                         )
+
                     );
 
 
                 if(
+
                     savedTime &&
                     Date.now()-savedTime>=30000
+
                 ){
 
                     localStorage.removeItem(
@@ -1083,6 +1365,7 @@ async function send(){
 
                 }
 
+
             },30000);
 
         }
@@ -1090,17 +1373,22 @@ async function send(){
 
     }catch(error){
 
+
         console.error(error);
+
 
         alert(
             "Could not send the feedback. Please try again❌."
         );
 
-        submitBtn.disabled=false;
+
+        submitBtn.disabled=
+            false;
 
     }
 
 }
+
 
 
 /* =========================================================
@@ -1109,7 +1397,10 @@ async function send(){
 
 checkCooldown();
 
+
 </script>
 
+
 </body>
-  </html>
+
+    </html>
