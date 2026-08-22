@@ -439,85 +439,6 @@ const badWords = [
 
 
 /* =========================================================
-   UNICODE DIGIT SYSTEM
-   ========================================================= */
-
-const unicodeZeroPoints = [
-
-    0x0030, // Latin
-    0x0660, // Arabic-Indic
-    0x06F0, // Persian
-    0x07C0, // NKo
-    0x0966, // Devanagari
-    0x09E6, // Bengali
-    0x0A66, // Gurmukhi
-    0x0AE6, // Gujarati
-    0x0B66, // Oriya
-    0x0BE6, // Tamil
-    0x0C66, // Telugu
-    0x0CE6, // Kannada
-    0x0D66, // Malayalam
-    0x0DE6, // Sinhala
-    0x0E50, // Thai
-    0x0ED0, // Lao
-    0x0F20, // Tibetan
-    0x1040, // Myanmar
-    0x1090, // Myanmar Shan
-    0x17E0, // Khmer
-    0x1810, // Mongolian
-    0x1946, // Limbu
-    0x19D0, // New Tai Lue
-    0x1A80, // Tai Tham Hora
-    0x1A90, // Tai Tham Tham
-    0x1B50, // Balinese
-    0x1BB0, // Sundanese
-    0x1C40, // Lepcha
-    0x1C50, // Ol Chiki
-    0xA620, // Vai
-    0xA8D0, // Saurashtra
-    0xA900, // Kayah Li
-    0xA9D0, // Javanese
-    0xA9F0, // Myanmar Tai Laing
-    0xAA50, // Cham
-    0xABF0, // Meetei Mayek
-    0xFF10  // Fullwidth
-
-];
-
-
-
-/* =========================================================
-   GET UNICODE DIGIT VALUE
-   ========================================================= */
-
-function getUnicodeDigitValue(char){
-
-    if(!char){
-        return null;
-    }
-
-    const code=char.codePointAt(0);
-
-    for(const zero of unicodeZeroPoints){
-
-        if(
-            code>=zero &&
-            code<=zero+9
-        ){
-
-            return code-zero;
-
-        }
-
-    }
-
-    return null;
-
-}
-
-
-
-/* =========================================================
    NORMALIZE TEXT
    ========================================================= */
 
@@ -542,36 +463,6 @@ function normalizeText(text){
     */
 
     result=result.toLowerCase();
-
-
-    /* =====================================================
-       NUMBER WORDS
-       =====================================================
-
-       Arabic:
-
-       ست
-       ستة
-       سبع
-       سبعة
-
-       English:
-
-       six
-       seven
-       ===================================================== */
-
-
-    result=result
-
-        .replace(/ستة/g,"6")
-        .replace(/ست/g,"6")
-
-        .replace(/سبعة/g,"7")
-        .replace(/سبع/g,"7")
-
-        .replace(/six/g,"6")
-        .replace(/seven/g,"7");
 
 
     /*
@@ -654,33 +545,7 @@ function normalizeText(text){
     );
 
 
-    /*
-       Convert decimal digits from other
-       Unicode writing systems.
-    */
-
-    let output="";
-
-
-    for(const char of result){
-
-        const value=getUnicodeDigitValue(char);
-
-
-        if(value!==null){
-
-            output+=String(value);
-
-        }else{
-
-            output+=char;
-
-        }
-
-    }
-
-
-    return output;
+    return result;
 
 }
 
@@ -715,111 +580,6 @@ function containsBadWord(text){
 
 
     return false;
-
-}
-
-
-
-/* =========================================================
-   6 / 7 SECURITY FILTER
-   =========================================================
-
-   Detects:
-
-   6 + 7
-   ست + سبع
-   ستة + سبعة
-   six + seven
-   ٦ + ٧
-   ６ + ７
-
-   Also detects them when characters are
-   between the numbers.
-
-   Example:
-
-   6abc7
-   ستة hello سبعة
-   six 🔥 seven
-
-   ========================================================= */
-
-function containsSixSevenCombination(text){
-
-    const normalized=
-        normalizeText(text);
-
-
-    const has6=
-        normalized.includes("6");
-
-
-    const has7=
-        normalized.includes("7");
-
-
-    /*
-       If both exist anywhere in the same
-       message, block it.
-    */
-
-    if(has6 && has7){
-
-        return true;
-
-    }
-
-
-    return false;
-
-}
-
-
-
-/* =========================================================
-   PREVIOUS MESSAGE 6 / 7 CHECK
-   ========================================================= */
-
-const LAST_DIGIT_KEY=
-    "ota_last_6_7_digit";
-
-
-
-function getSixSevenState(text){
-
-    const normalized=
-        normalizeText(text);
-
-
-    const has6=
-        normalized.includes("6");
-
-
-    const has7=
-        normalized.includes("7");
-
-
-    if(
-        has6 &&
-        !has7
-    ){
-
-        return "6";
-
-    }
-
-
-    if(
-        has7 &&
-        !has6
-    ){
-
-        return "7";
-
-    }
-
-
-    return null;
 
 }
 
@@ -1078,23 +838,6 @@ async function send(){
 
 
     /* =====================================================
-       6 / 7 SAME MESSAGE PROTECTION
-       ===================================================== */
-
-    if(
-        containsSixSevenCombination(text)
-    ){
-
-        alert(
-            "🚫 This message cannot be sent."
-        );
-
-        return;
-
-    }
-
-
-    /* =====================================================
        BAD WORD PROTECTION
        ===================================================== */
 
@@ -1105,59 +848,6 @@ async function send(){
         alert(
             "🚫Your message contains a prohibited word. Please remove it and try again🚫."
         );
-
-        return;
-
-    }
-
-
-    /* =====================================================
-       6 / 7 PREVIOUS MESSAGE PROTECTION
-       ===================================================== */
-
-    const currentState=
-        getSixSevenState(text);
-
-
-    const previousState=
-        localStorage.getItem(
-            LAST_DIGIT_KEY
-        );
-
-
-    /*
-       Previous = 6
-       Current  = 7
-
-       OR
-
-       Previous = 7
-       Current  = 6
-
-       => BLOCK
-    */
-
-    if(
-
-        previousState &&
-        currentState &&
-        previousState!==currentState
-
-    ){
-
-        alert(
-            "🚫 This message cannot be sent."
-        );
-
-
-        /*
-           IMPORTANT:
-
-           Do NOT change LAST_DIGIT_KEY.
-
-           This prevents bypassing the filter
-           by repeatedly trying the opposite number.
-        */
 
         return;
 
@@ -1241,24 +931,6 @@ async function send(){
 
         count.innerText=
             "0";
-
-
-        /*
-           SAVE 6 / 7 STATE ONLY AFTER
-           SUCCESSFUL TELEGRAM SEND.
-        */
-
-        if(currentState){
-
-            localStorage.setItem(
-
-                LAST_DIGIT_KEY,
-
-                currentState
-
-            );
-
-        }
 
 
         /* =================================================
@@ -1403,4 +1075,4 @@ checkCooldown();
 
 </body>
 
-    </html>
+</html>
