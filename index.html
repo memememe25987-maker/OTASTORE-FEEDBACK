@@ -1,43 +1,27 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
-
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
 <title>OTA STORE Feedback</title>
 
 <style>
 
-* {
-    box-sizing: border-box;
+body{
+    margin:0;
+    font-family:Arial,sans-serif;
+    background:#000;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    min-height:100vh;
+
+    transform:scale(1.4);
+    transform-origin:top center;
 }
 
-body {
-    margin: 0;
-    min-height: 100vh;
-
-    background: #000;
-
-    display: flex;
-    justify-content: center;
-    align-items: center;
-
-    font-family: Arial, sans-serif;
-
-    color: white;
-}
-
-.container {
-    width: min(90%, 500px);
-    text-align: center;
-}
-
-h1 {
-    margin: 0 0 10px;
-
-    color: #00ccff;
+h1,h2{
+    color:#00ccff;
 
     text-shadow:
         0 0 8px #00ccff,
@@ -45,113 +29,83 @@ h1 {
         0 0 35px #00ccff;
 }
 
-h2 {
-    margin: 0 0 25px;
+textarea{
+    width:100%;
+    height:150px;
 
-    color: #00ccff;
+    background:#000;
+    color:#fff;
 
-    text-shadow:
-        0 0 8px #00ccff,
-        0 0 18px #00ccff;
+    border:3px solid #00ccff;
+    border-radius:12px;
+
+    padding:12px;
+
+    font-size:16px;
+
+    resize:none;
+    box-sizing:border-box;
+    outline:none;
+
+    box-shadow:0 0 18px #00ccff;
 }
 
-textarea {
-    width: 100%;
-    height: 150px;
-
-    padding: 15px;
-
-    background: #000;
-
-    color: white;
-
-    border: 2px solid #00ccff;
-    border-radius: 12px;
-
-    outline: none;
-
-    resize: none;
-
-    font-size: 16px;
-
-    box-shadow:
-        0 0 10px #00ccff,
-        inset 0 0 10px rgba(0, 204, 255, 0.15);
+.counter{
+    color:#00ccff;
 }
 
-textarea:focus {
-    box-shadow:
-        0 0 15px #00ccff,
-        0 0 30px rgba(0, 204, 255, 0.35),
-        inset 0 0 15px rgba(0, 204, 255, 0.15);
+button{
+    width:100%;
+
+    padding:14px;
+    margin-top:20px;
+
+    background:#00ccff;
+    color:#000;
+
+    border:none;
+    border-radius:10px;
+
+    font-size:18px;
+    font-weight:bold;
+
+    cursor:pointer;
+
+    box-shadow:0 0 20px #00ccff;
+
+    transition:.25s;
 }
 
-textarea::placeholder {
-    color: #777;
+button:hover{
+
+    box-shadow:0 0 35px #00ccff;
+
+    transform:scale(1.03);
 }
 
-.counter {
-    margin-top: 8px;
+button:disabled{
 
-    color: #00ccff;
+    background:#333;
+    color:#888;
 
-    font-size: 14px;
+    box-shadow:none;
+
+    cursor:not-allowed;
+
+    transform:none;
 }
 
-button {
-    width: 100%;
+#cooldown{
 
-    margin-top: 20px;
+    display:none;
 
-    padding: 14px;
+    color:#ff3333;
 
-    border: none;
-    border-radius: 10px;
+    text-align:center;
 
-    background: #00ccff;
+    font-weight:bold;
 
-    color: #000;
-
-    font-size: 18px;
-    font-weight: bold;
-
-    cursor: pointer;
-
-    box-shadow:
-        0 0 10px #00ccff,
-        0 0 25px rgba(0, 204, 255, 0.5);
-
-    transition: 0.2s;
-}
-
-button:hover {
-    transform: scale(1.02);
-
-    box-shadow:
-        0 0 15px #00ccff,
-        0 0 35px rgba(0, 204, 255, 0.7);
-}
-
-button:disabled {
-    background: #333;
-
-    color: #777;
-
-    cursor: not-allowed;
-
-    box-shadow: none;
-
-    transform: none;
-}
-
-#cooldown {
-    display: none;
-
-    margin-top: 15px;
-
-    color: #ff3333;
-
-    font-weight: bold;
+    margin-top:15px;
 
     text-shadow:
         0 0 8px #ff3333,
@@ -159,362 +113,921 @@ button:disabled {
 }
 
 </style>
-
 </head>
 
 <body>
 
 <div class="container">
 
-    <h1>OTA STORE</h1>
+<h1>OTA STORE</h1>
 
-    <h2>Feedback</h2>
+<h2>Feedback</h2>
 
-    <textarea
-        id="feedback"
-        maxlength="150"
-        placeholder="Type your feedback..."
-    ></textarea>
+<textarea
+    id="feedback"
+    maxlength="150"
+    placeholder="Type your feedback..."
+></textarea>
 
-    <div class="counter">
-        <span id="count">0</span>/150
-    </div>
+<div class="counter">
+    <span id="count">0</span>/150
+</div>
 
-    <button
-        id="submitBtn"
-        onclick="send()"
-    >
-        SUBMIT
-    </button>
+<button
+    id="submitBtn"
+    onclick="send()"
+>
+    Submit
+</button>
 
-    <div id="cooldown">
-        Cooldown:
-        <span id="timer">2:00</span>
-    </div>
+<div id="cooldown">
+    Cooldown:
+    <span id="timer">2:00</span>
+</div>
 
 </div>
 
-
 <script>
 
-/* =====================================================
-   CLOUDFLARE WORKER URL
-   ===================================================== */
+
+/* =========================================================
+   CLOUDFLARE WORKER
+   ========================================================= */
 
 const WORKER_URL =
     "https://cold-glade-bb87.ota471taki0000-c52.workers.dev";
 
 
-/* =====================================================
-   ELEMENTS
-   ===================================================== */
+/* =========================================================
+   BAD WORDS
+   ========================================================= */
 
-const box =
-    document.getElementById("feedback");
+const badWords = [
 
-const count =
-    document.getElementById("count");
+    /* ================= ENGLISH ================= */
 
-const submitBtn =
-    document.getElementById("submitBtn");
+    "fuck",
+    "fucking",
+    "fucked",
+    "fucker",
+    "fuckers",
+    "motherfuck",
+    "motherfucker",
+    "motherfuckers",
+    "motherfucking",
 
-const cooldownBox =
-    document.getElementById("cooldown");
+    "shit",
+    "shits",
+    "shitty",
+    "bullshit",
 
-const timer =
-    document.getElementById("timer");
+    "bitch",
+    "bitches",
+    "bitching",
+    "bitchy",
+
+    "asshole",
+    "assholes",
+    "dumbass",
+    "jackass",
+    "smartass",
+
+    "bastard",
+    "dick",
+    "dicks",
+    "dickhead",
+    "dickheads",
+
+    "cock",
+    "cocksucker",
+    "cocksuckers",
+
+    "pussy",
+    "pussies",
+
+    "cunt",
+    "cunts",
+
+    "slut",
+    "sluts",
+    "slutty",
+
+    "whore",
+    "whores",
+
+    "hoe",
+    "hoes",
+
+    "wanker",
+    "wank",
+    "jerkoff",
+    "jerk",
+
+    "prick",
+    "twat",
+    "douche",
+    "douchebag",
+    "scumbag",
+
+    "piss",
+    "pissed",
+
+    "crap",
+    "damn",
+    "dammit",
+    "hell",
 
 
-/* =====================================================
-   CHARACTER COUNTER
-   ===================================================== */
+    /* ================= SLURS ================= */
 
-box.addEventListener("input", () => {
+    "nigga",
+    "nigger",
+    "niggers",
 
-    count.textContent =
-        box.value.length;
+    "faggot",
+    "faggots",
+    "fag",
 
-});
+    "retard",
+    "retarded",
+    "retards",
 
-
-/* =====================================================
-   COOLDOWN STORAGE
-   ===================================================== */
-
-const FIRST_MESSAGE_KEY =
-    "ota_first_message_time";
-
-const COOLDOWN_KEY =
-    "ota_cooldown_until";
-
-let countdownInterval = null;
+    "dyke",
+    "tranny",
 
 
-/* =====================================================
-   FORMAT TIME
-   ===================================================== */
+    /* ================= ARABIC ================= */
 
-function formatTime(ms) {
+    "شرموطة",
+    "شرموط",
+    "شراميط",
+    "شرموطات",
 
-    const seconds =
-        Math.ceil(ms / 1000);
+    "قحبة",
+    "قحبه",
+    "قحاب",
+    "قحبات",
+    "قحبان",
 
-    const minutes =
-        Math.floor(seconds / 60);
+    "قواد",
+    "قوادة",
 
-    const remainingSeconds =
-        seconds % 60;
+    "منيك",
+    "منايك",
+    "منيوك",
+    "منيوكه",
+    "منايكه",
 
-    return (
-        minutes +
-        ":" +
-        remainingSeconds
-            .toString()
-            .padStart(2, "0")
+    "نيك",
+    "نيكت",
+    "نيكتك",
+    "نيكك",
+    "نايك",
+    "نايكه",
+    "نايكين",
+    "نياكة",
+    "نياكه",
+
+    "كسم",
+    "كسمك",
+    "كسسمك",
+    "كسكم",
+    "كسها",
+    "كسه",
+    "كسيك",
+    "كسختك",
+
+    "زبي",
+    "زبك",
+    "زبه",
+    "زبر",
+    "زبيبة",
+
+    "ايري",
+    "ايرك",
+    "ايره",
+    "عيري",
+    "عيرك",
+
+    "عرص",
+    "عرصا",
+    "عرصي",
+    "عرصى",
+    "عراص",
+    "عريص",
+
+    "خول",
+    "خوال",
+    "مخنث",
+    "مخنوث",
+    "ديوث",
+    "ديوثة",
+
+    "لوطي",
+    "لواطي",
+    "لواط",
+
+    "سحاق",
+    "سحاقية",
+
+
+    /* ================= FAMILY INSULTS ================= */
+
+    "ابوك",
+    "أبوك",
+    "ابوكك",
+    "أبوكك",
+
+    "امك",
+    "أمك",
+    "امكك",
+    "أمكك",
+
+    "اختك",
+    "أختك",
+    "اخوك",
+    "أخوك",
+
+
+    /* ================= CURSING ================= */
+
+    "يلعن",
+    "العن",
+    "لعنة",
+    "لعنه",
+    "ملعون",
+
+    "يلعنك",
+    "العنك",
+
+    "يلعن ابوك",
+    "يلعن امك",
+    "العن ابوك",
+    "العن امك",
+
+
+    /* ================= GROSS INSULTS ================= */
+
+    "خرا",
+    "خراء",
+    "وسخ",
+    "وسخة",
+    "وسخين",
+    "نجس",
+    "نجسة",
+
+    "زبالة",
+    "قذر",
+    "قذرة",
+    "قذرين",
+
+    "حمار",
+    "حمارة",
+    "حمير",
+
+    "كلب",
+    "كلبة",
+    "كلاب",
+
+    "حيوان",
+    "حيوانة",
+
+    "غبي",
+    "غبية",
+    "اغبى",
+
+    "تافه",
+    "تافهة",
+
+    "حقير",
+    "حقيرة",
+
+    "منحط",
+    "منحطة"
+
+];
+
+
+/* =========================================================
+   NORMALIZE TEXT
+   ========================================================= */
+
+function normalizeText(text){
+
+    let result=text;
+
+
+    /*
+       Unicode normalization
+    */
+
+    try{
+
+        result=result.normalize("NFKC");
+
+    }catch(e){}
+
+
+    /*
+       Lowercase
+    */
+
+    result=result.toLowerCase();
+
+
+    /*
+       Arabic letters
+    */
+
+    result=result
+
+        .replace(/[أإآٱ]/g,"ا")
+        .replace(/ى/g,"ي")
+        .replace(/ة/g,"ه");
+
+
+    /*
+       Arabic / Persian digits
+    */
+
+    result=result
+
+        .replace(/٠/g,"0")
+        .replace(/١/g,"1")
+        .replace(/٢/g,"2")
+        .replace(/٣/g,"3")
+        .replace(/٤/g,"4")
+        .replace(/٥/g,"5")
+        .replace(/٦/g,"6")
+        .replace(/٧/g,"7")
+        .replace(/٨/g,"8")
+        .replace(/٩/g,"9")
+
+        .replace(/۰/g,"0")
+        .replace(/۱/g,"1")
+        .replace(/۲/g,"2")
+        .replace(/۳/g,"3")
+        .replace(/۴/g,"4")
+        .replace(/۵/g,"5")
+        .replace(/۶/g,"6")
+        .replace(/۷/g,"7")
+        .replace(/۸/g,"8")
+        .replace(/۹/g,"9");
+
+
+    /*
+       Arabic diacritics
+    */
+
+    result=result.replace(
+        /[\u064B-\u065F\u0670]/g,
+        ""
     );
+
+
+    /*
+       Zero-width / invisible characters
+    */
+
+    result=result.replace(
+        /[\u200B-\u200F\u202A-\u202E\u2060-\u206F\uFEFF]/g,
+        ""
+    );
+
+
+    /*
+       Tatweel
+    */
+
+    result=result.replace(
+        /ـ/g,
+        ""
+    );
+
+
+    /*
+       Remove common separators
+    */
+
+    result=result.replace(
+        /[\s._\-|/\\*+~=!?@#$%^&()[\]{}<>:;"',،؛]/g,
+        ""
+    );
+
+
+    return result;
+
 }
 
 
-/* =====================================================
-   START COOLDOWN
-   ===================================================== */
+/* =========================================================
+   BAD WORD CHECK
+   ========================================================= */
 
-function startCooldown(until) {
+function containsBadWord(text){
 
-    clearInterval(countdownInterval);
+    const normalizedText=
+        normalizeText(text);
 
-    cooldownBox.style.display =
+
+    for(const word of badWords){
+
+        const normalizedWord=
+            normalizeText(word);
+
+
+        if(
+            normalizedWord.length>=3 &&
+            normalizedText.includes(normalizedWord)
+        ){
+
+            return true;
+
+        }
+
+    }
+
+
+    return false;
+
+}
+
+
+/* =========================================================
+   ELEMENTS
+   ========================================================= */
+
+const box=
+    document.getElementById("feedback");
+
+
+const submitBtn=
+    document.getElementById("submitBtn");
+
+
+const cooldownBox=
+    document.getElementById("cooldown");
+
+
+const timer=
+    document.getElementById("timer");
+
+
+const count=
+    document.getElementById("count");
+
+
+/* =========================================================
+   STORAGE SETTINGS
+   ========================================================= */
+
+const FIRST_MESSAGE_KEY=
+    "ota_first_message_time";
+
+
+const COOLDOWN_KEY=
+    "ota_cooldown_until";
+
+
+let countdownInterval=null;
+
+
+/* =========================================================
+   CHARACTER COUNTER
+   ========================================================= */
+
+box.addEventListener(
+    "input",
+    ()=>{
+
+        count.innerText=
+            box.value.length;
+
+    }
+);
+
+
+/* =========================================================
+   TIME FORMAT
+   ========================================================= */
+
+function formatTime(milliseconds){
+
+    let totalSeconds=
+        Math.ceil(
+            milliseconds/1000
+        );
+
+
+    let minutes=
+        Math.floor(
+            totalSeconds/60
+        );
+
+
+    let seconds=
+        totalSeconds%60;
+
+
+    return (
+
+        minutes+
+        ":"+
+        seconds
+            .toString()
+            .padStart(2,"0")
+
+    );
+
+}
+
+
+/* =========================================================
+   START COOLDOWN DISPLAY
+   ========================================================= */
+
+function startCooldown(until){
+
+    clearInterval(
+        countdownInterval
+    );
+
+
+    cooldownBox.style.display=
         "block";
 
-    submitBtn.disabled =
+
+    submitBtn.disabled=
         true;
 
-    function update() {
 
-        const remaining =
-            until - Date.now();
+    function update(){
 
-        if (remaining <= 0) {
+        const remaining=
+            until-Date.now();
+
+
+        if(remaining<=0){
 
             clearInterval(
                 countdownInterval
             );
 
+
             localStorage.removeItem(
                 COOLDOWN_KEY
             );
+
 
             localStorage.removeItem(
                 FIRST_MESSAGE_KEY
             );
 
-            cooldownBox.style.display =
+
+            cooldownBox.style.display=
                 "none";
 
-            submitBtn.disabled =
+
+            submitBtn.disabled=
                 false;
 
-            timer.textContent =
+
+            timer.innerText=
                 "2:00";
 
+
             return;
+
         }
 
-        timer.textContent =
+
+        timer.innerText=
             formatTime(remaining);
+
     }
+
 
     update();
 
-    countdownInterval =
-        setInterval(update, 250);
+
+    countdownInterval=
+        setInterval(
+            update,
+            250
+        );
+
 }
 
 
-/* =====================================================
-   CHECK COOLDOWN
-   ===================================================== */
+/* =========================================================
+   CHECK EXISTING COOLDOWN
+   ========================================================= */
 
-function checkCooldown() {
+function checkCooldown(){
 
-    const until =
+    const cooldownUntil=
         Number(
             localStorage.getItem(
                 COOLDOWN_KEY
             )
         );
 
-    if (
-        until &&
-        until > Date.now()
-    ) {
 
-        startCooldown(until);
+    if(
+        cooldownUntil &&
+        cooldownUntil>Date.now()
+    ){
+
+        startCooldown(
+            cooldownUntil
+        );
+
 
         return true;
+
     }
 
-    if (until) {
+
+    if(cooldownUntil){
 
         localStorage.removeItem(
             COOLDOWN_KEY
         );
+
     }
 
+
     return false;
+
 }
 
 
-/* =====================================================
-   SEND
-   ===================================================== */
+/* =========================================================
+   SEND FEEDBACK
+   ========================================================= */
 
-async function send() {
+async function send(){
 
-    if (checkCooldown()) {
+
+    /*
+       Don't allow sending during cooldown.
+    */
+
+    if(checkCooldown()){
+
         return;
+
     }
 
-    const text =
+
+    let text=
         box.value.trim();
 
-    if (!text) {
+
+    /*
+       Empty message.
+    */
+
+    if(text===""){
 
         alert(
-            "Please enter your feedback."
+            "Please enter feedback."
         );
 
         return;
+
     }
 
-    submitBtn.disabled =
+
+    /* =====================================================
+       BAD WORD PROTECTION
+       ===================================================== */
+
+    if(
+        containsBadWord(text)
+    ){
+
+        alert(
+            "🚫Your message contains a prohibited word. Please remove it and try again🚫."
+        );
+
+        return;
+
+    }
+
+
+    /*
+       Disable button while sending.
+    */
+
+    submitBtn.disabled=
         true;
 
-    try {
 
-        /*
-         * ONLY the feedback text
-         * goes to Cloudflare.
-         *
-         * BOT_TOKEN and CHAT_ID
-         * are NOT here.
-         */
+    try{
 
-        const response =
+
+        const response=
             await fetch(
-                WORKER_URL,
-                {
-                    method: "POST",
 
-                    headers: {
+                WORKER_URL,
+
+                {
+
+                    method:"POST",
+
+                    headers:{
                         "Content-Type":
                             "application/json"
                     },
 
-                    body: JSON.stringify({
-                        text: text
+                    body:JSON.stringify({
+
+                        text:
+                            text
+
                     })
+
                 }
+
             );
 
-        const result =
+
+        const result=
             await response.json();
 
-        if (
+
+        /*
+           Worker / Telegram failed.
+        */
+
+        if(
+
             !response.ok ||
             !result.success
-        ) {
+
+        ){
 
             throw new Error(
-                result.error ||
-                "Worker failed"
+                "Worker request failed."
             );
+
         }
 
 
-        /* ==============================
+        /* =================================================
            SUCCESS
-           ============================== */
+           ================================================= */
 
         alert(
-            "Thank you for your feedback! ✅"
+            "Thank you for your feedback!✅"
         );
 
-        box.value = "";
 
-        count.textContent =
+        box.value="";
+
+
+        count.innerText=
             "0";
 
 
-        /* ==============================
-           EXISTING 30 SECOND LOGIC
-           ============================== */
+        /* =================================================
+           NORMAL COOLDOWN SYSTEM
+           ================================================= */
 
-        const now =
+        const now=
             Date.now();
 
-        const firstMessage =
+
+        const firstMessageTime=
             Number(
+
                 localStorage.getItem(
                     FIRST_MESSAGE_KEY
                 )
+
             );
 
-        if (
-            firstMessage &&
-            now - firstMessage <= 30000
-        ) {
 
-            const cooldownUntil =
-                now + 120000;
+        let triggerCooldown=
+            false;
+
+
+        if(
+
+            firstMessageTime &&
+            now-firstMessageTime<=30000
+
+        ){
+
+            triggerCooldown=
+                true;
+
+        }
+
+
+        if(triggerCooldown){
+
+
+            const cooldownUntil=
+                Date.now()+
+                (2*60*1000);
+
 
             localStorage.setItem(
+
                 COOLDOWN_KEY,
-                cooldownUntil
+
+                cooldownUntil.toString()
+
             );
+
 
             localStorage.removeItem(
                 FIRST_MESSAGE_KEY
             );
 
+
             startCooldown(
                 cooldownUntil
             );
 
-        } else {
+
+        }else{
+
 
             localStorage.setItem(
+
                 FIRST_MESSAGE_KEY,
-                now
+
+                Date.now().toString()
+
             );
 
-            submitBtn.disabled =
+
+            submitBtn.disabled=
                 false;
+
+
+            setTimeout(()=>{
+
+
+                const savedTime=
+                    Number(
+
+                        localStorage.getItem(
+                            FIRST_MESSAGE_KEY
+                        )
+
+                    );
+
+
+                if(
+
+                    savedTime &&
+                    Date.now()-savedTime>=30000
+
+                ){
+
+                    localStorage.removeItem(
+                        FIRST_MESSAGE_KEY
+                    );
+
+                }
+
+
+            },30000);
 
         }
 
-    } catch (error) {
+
+    }catch(error){
+
 
         console.error(error);
 
+
         alert(
-            "Could not send the feedback. Please try again ❌."
+            "Could not send the feedback. Please try again❌."
         );
 
-        submitBtn.disabled =
+
+        submitBtn.disabled=
             false;
+
     }
+
 }
 
 
-/* =====================================================
-   CHECK WHEN PAGE OPENS
-   ===================================================== */
+/* =========================================================
+   PAGE LOAD
+   ========================================================= */
 
 checkCooldown();
+
 
 </script>
 
 </body>
-
 </html>
