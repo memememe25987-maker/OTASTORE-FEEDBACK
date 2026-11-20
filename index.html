@@ -1,538 +1,198 @@
 
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ar" dir="rtl">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>OTA STORE Feedback</title>
+<title>OTA STORE | Maintenance</title>
 
 <style>
-
-body{
-    margin:0;
-    font-family:Arial,sans-serif;
-    background:#000;
-    display:flex;
-    justify-content:center;
-    align-items:center;
-    min-height:100vh;
-    transform:scale(1.4);
-    transform-origin:top center;
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
 }
 
-h1,h2{
-    color:#00ccff;
-    text-shadow:
-        0 0 8px #00ccff,
-        0 0 18px #00ccff,
-        0 0 35px #00ccff;
+body {
+    height: 100vh;
+    overflow: hidden;
+    background: #02060d;
+    font-family: Arial, sans-serif;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
 }
 
-textarea{
-    width:100%;
-    height:150px;
-    background:#000;
-    color:#fff;
-    border:3px solid #00ccff;
-    border-radius:12px;
-    padding:12px;
-    font-size:16px;
-    resize:none;
-    box-sizing:border-box;
-    outline:none;
-    box-shadow:0 0 18px #00ccff;
+.background {
+    position: absolute;
+    inset: -50%;
+    background:
+        radial-gradient(circle at 50% 50%, #063d69 0%, transparent 30%),
+        radial-gradient(circle at 20% 70%, #001b36 0%, transparent 35%),
+        radial-gradient(circle at 80% 20%, #002b4b 0%, transparent 35%);
+    animation: backgroundMove 12s ease-in-out infinite alternate;
 }
 
-.counter{
-    color:#00ccff;
+@keyframes backgroundMove {
+    from { transform: translate(-3%, -2%) scale(1); }
+    to { transform: translate(3%, 2%) scale(1.2); }
 }
 
-button{
-    width:100%;
-    padding:14px;
-    margin-top:20px;
-    background:#00ccff;
-    color:#000;
-    border:none;
-    border-radius:10px;
-    font-size:18px;
-    font-weight:bold;
-    cursor:pointer;
-    box-shadow:0 0 20px #00ccff;
-    transition:.25s;
+.grid {
+    position: absolute;
+    inset: 0;
+    background-image:
+        linear-gradient(rgba(0,170,255,.045) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(0,170,255,.045) 1px, transparent 1px);
+    background-size: 45px 45px;
+    mask-image: linear-gradient(transparent, black, transparent);
 }
 
-button:hover{
-    box-shadow:0 0 35px #00ccff;
-    transform:scale(1.03);
+.glow {
+    position: absolute;
+    width: 260px;
+    height: 260px;
+    border-radius: 50%;
+    background: #008cff;
+    filter: blur(130px);
+    opacity: .18;
+    animation: pulse 4s infinite alternate;
 }
 
-button:disabled{
-    background:#333;
-    color:#888;
-    box-shadow:none;
-    cursor:not-allowed;
-    transform:none;
+@keyframes pulse {
+    to { opacity: .4; transform: scale(1.5); }
 }
 
-#cooldown{
-    display:none;
-    color:#ff3333;
-    text-align:center;
-    font-weight:bold;
-    margin-top:15px;
-    text-shadow:
-        0 0 8px #ff3333,
-        0 0 18px #ff3333;
+.container {
+    position: relative;
+    z-index: 2;
+    width: 100%;
+    text-align: center;
+    padding: 25px;
+    animation: entrance 1.5s ease forwards;
 }
 
-/* VERIFICATION POPUP */
-
-#verificationOverlay{
-    position:fixed;
-    inset:0;
-    background:rgba(0,0,0,0.96);
-    display:flex;
-    justify-content:center;
-    align-items:center;
-    z-index:999999;
-    opacity:1;
+@keyframes entrance {
+    from { opacity: 0; transform: translateY(35px); }
+    to { opacity: 1; transform: translateY(0); }
 }
 
-.verificationBox{
-    text-align:center;
-    padding:30px;
-    width:80%;
-    max-width:300px;
-    border:2px solid #00ccff;
-    border-radius:15px;
-    box-shadow:0 0 25px #00ccff;
-    background:#050505;
+.icon {
+    width: 95px;
+    height: 95px;
+    border: 2px solid rgba(0,174,255,.5);
+    border-radius: 50%;
+    margin: 0 auto 35px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 0 30px rgba(0,145,255,.2),
+                inset 0 0 25px rgba(0,145,255,.12);
+    animation: rotate 12s linear infinite, iconGlow 3s infinite alternate;
 }
 
-.loader{
-    width:45px;
-    height:45px;
-    border:4px solid #222;
-    border-top:4px solid #00ccff;
-    border-radius:50%;
-    margin:0 auto 20px;
-    animation:spin .8s linear infinite;
+.icon svg {
+    width: 43px;
+    height: 43px;
+    stroke: #20baff;
+    stroke-width: 1.7;
+    fill: none;
 }
 
-@keyframes spin{
-    to{transform:rotate(360deg);}
+@keyframes rotate {
+    to { transform: rotate(360deg); }
 }
 
-.verificationBox h2{
-    font-size:17px;
-    margin-bottom:10px;
+@keyframes iconGlow {
+    to { box-shadow: 0 0 55px rgba(0,145,255,.5); }
 }
 
-.verificationBox p{
-    color:#aaa;
-    font-size:13px;
+h1 {
+    font-size: clamp(27px, 7vw, 43px);
+    font-weight: 800;
+    margin-bottom: 18px;
+    background: linear-gradient(90deg, #fff, #29bdff, #fff);
+    background-size: 200%;
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    animation: shine 4s linear infinite;
 }
 
+@keyframes shine {
+    to { background-position: 200%; }
+}
+
+.line {
+    width: 90px;
+    height: 3px;
+    background: #00aaff;
+    margin: 0 auto 40px;
+    border-radius: 5px;
+    box-shadow: 0 0 15px #00aaff;
+    animation: line 2s infinite alternate;
+}
+
+@keyframes line {
+    to { width: 145px; opacity: .5; }
+}
+
+.brand {
+    position: relative;
+    display: inline-block;
+    font-size: clamp(36px, 10vw, 55px);
+    font-weight: 1000;
+    letter-spacing: 5px;
+    color: #20baff;
+    text-shadow: 0 0 10px #008cff,
+                 0 0 30px rgba(0,145,255,.7);
+    animation: brandGlow 3s infinite alternate;
+}
+
+@keyframes brandGlow {
+    to { text-shadow: 0 0 20px #00aaff, 0 0 55px #0077ff; }
+}
+
+.brand::after {
+    content: "";
+    position: absolute;
+    bottom: -12px;
+    left: 10%;
+    width: 80%;
+    height: 2px;
+    background: linear-gradient(90deg, transparent, #00aaff, transparent);
+}
+
+@media(max-height: 550px) {
+    .icon { width: 65px; height: 65px; margin-bottom: 15px; }
+    .icon svg { width: 30px; }
+    .line { margin-bottom: 20px; }
+}
 </style>
 </head>
 
 <body>
 
-<div id="verificationOverlay">
-    <div class="verificationBox">
-        <div class="loader"></div>
-        <h2>Verifying you're not a robot</h2>
-        <p>Please wait while we verify your connection...</p>
-    </div>
-</div>
+<div class="background"></div>
+<div class="grid"></div>
+<div class="glow"></div>
 
 <div class="container">
 
-<h1>OTA STORE</h1>
-<h2>Feedback</h2>
+    <div class="icon">
+        <svg viewBox="0 0 24 24">
+            <path d="M14.7 6.3a5 5 0 0 0-6.6 6.6L3 18l3 3 5.1-5.1a5 5 0 0 0 6.6-6.6L14 13l-3-3z"/>
+        </svg>
+    </div>
 
-<textarea
-    id="feedback"
-    maxlength="250"
-    placeholder="Type your feedback..."
-></textarea>
+    <h1>الموقع قيد الصيانة</h1>
 
-<div class="counter">
-    <span id="count">0</span>/250
-</div>
+    <div class="line"></div>
 
-<button id="submitBtn" onclick="send()">
-    Submit
-</button>
-
-<div id="cooldown">
-    Cooldown:
-    <span id="timer">2:00</span>
-</div>
+    <div class="brand">OTA STORE</div>
 
 </div>
-
-<script>
-
-const WORKER_URL =
-    "https://cold-glade-bb87.ota471taki0000-c52.workers.dev";
-
-/* RANDOM VERIFICATION */
-
-window.addEventListener("load",function(){
-
-    const delay=Math.floor(Math.random()*3000)+1000;
-
-    setTimeout(function(){
-
-        const overlay=document.getElementById(
-            "verificationOverlay"
-        );
-
-        overlay.style.transition="opacity .4s";
-        overlay.style.opacity="0";
-
-        setTimeout(function(){
-            overlay.remove();
-        },400);
-
-    },delay);
-
-});
-
-const badWords = [
-
-"fuck","fucking","fucked","fucker","fuckers",
-"motherfuck","motherfucker","motherfuckers","motherfucking",
-"shit","shits","shitty","bullshit",
-"bitch","bitches","bitching","bitchy",
-"asshole","assholes","dumbass","jackass","smartass",
-"bastard","dick","dicks","dickhead","dickheads",
-"cock","cocksucker","cocksuckers",
-"pussy","pussies","cunt","cunts",
-"slut","sluts","slutty","whore","whores",
-"hoe","hoes","wanker","wank","jerkoff","jerk",
-"prick","twat","douche","douchebag","scumbag",
-"piss","pissed","crap","damn","dammit","hell",
-"nigga","nigger","niggers",
-"faggot","faggots","fag",
-"retard","retarded","retards","dyke","tranny",
-
-"شرموطة","شرموط","شراميط","شرموطات",
-"قحبة","قحبه","قحاب","قحبات","قحبان",
-"قواد","قوادة",
-"منيك","منايك","منيوك","منيوكه","منايكه",
-"نيك","نيكت","نيكتك","نيكك","نايك","نايكه","نايكين",
-"نياكة","نياكه",
-"كسم","كسمك","كسسمك","كسكم","كسها","كسه","كسيك","كسختك",
-"زبي","زبك","زبه","زبر","زبيبة",
-"ايري","ايرك","ايره","عيري","عيرك",
-"عرص","عرصا","عرصي","عرصى","عراص","عريص",
-"خول","خوال","مخنث","مخنوث","ديوث","ديوثة",
-"لوطي","لواطي","لواط","سحاق","سحاقية",
-
-"ابوك","أبوك","ابوكك","أبوكك",
-"امك","أمك","امكك","أمكك",
-"اختك","أختك","اخوك","أخوك",
-
-"يلعن","العن","لعنة","لعنه","ملعون",
-"يلعنك","العنك",
-"يلعن ابوك","يلعن امك","العن ابوك","العن امك",
-
-"خرا","خراء","وسخ","وسخة","وسخين","نجس","نجسة",
-"زبالة","قذر","قذرة","قذرين",
-"حمار","حمارة","حمير","كلب","كلبة","كلاب",
-"حيوان","حيوانة","غبي","غبية","اغبى",
-"تافه","تافهة","حقير","حقيرة","منحط","منحطة"
-
-];
-
-function normalizeText(text){
-
-    let result=text;
-
-    try{
-        result=result.normalize("NFKC");
-    }catch(e){}
-
-    result=result.toLowerCase();
-
-    result=result
-        .replace(/[أإآٱ]/g,"ا")
-        .replace(/ى/g,"ي")
-        .replace(/ة/g,"ه");
-
-    result=result
-        .replace(/٠/g,"0")
-        .replace(/١/g,"1")
-        .replace(/٢/g,"2")
-        .replace(/٣/g,"3")
-        .replace(/٤/g,"4")
-        .replace(/٥/g,"5")
-        .replace(/٦/g,"6")
-        .replace(/٧/g,"7")
-        .replace(/٨/g,"8")
-        .replace(/٩/g,"9")
-        .replace(/۰/g,"0")
-        .replace(/۱/g,"1")
-        .replace(/۲/g,"2")
-        .replace(/۳/g,"3")
-        .replace(/۴/g,"4")
-        .replace(/۵/g,"5")
-        .replace(/۶/g,"6")
-        .replace(/۷/g,"7")
-        .replace(/۸/g,"8")
-        .replace(/۹/g,"9");
-
-    result=result.replace(
-        /[\u064B-\u065F\u0670]/g,
-        ""
-    );
-
-    result=result.replace(
-        /[\u200B-\u200F\u202A-\u202E\u2060-\u206F\uFEFF]/g,
-        ""
-    );
-
-    result=result.replace(/ـ/g,"");
-
-    result=result.replace(
-        /[\s._\-|/\\*+~=!?@#$%^&()[\]{}<>:;"',،؛]/g,
-        ""
-    );
-
-    return result;
-}
-
-function containsBadWord(text){
-
-    const normalizedText=normalizeText(text);
-
-    for(const word of badWords){
-
-        const normalizedWord=normalizeText(word);
-
-        if(
-            normalizedWord.length>=3 &&
-            normalizedText.includes(normalizedWord)
-        ){
-            return true;
-        }
-    }
-
-    return false;
-}
-
-const box=document.getElementById("feedback");
-const submitBtn=document.getElementById("submitBtn");
-const cooldownBox=document.getElementById("cooldown");
-const timer=document.getElementById("timer");
-const count=document.getElementById("count");
-
-const FIRST_MESSAGE_KEY="ota_first_message_time";
-const COOLDOWN_KEY="ota_cooldown_until";
-
-let countdownInterval=null;
-
-/* CHARACTER COUNTER */
-
-function updateCounter(){
-    count.innerText=box.value.length;
-}
-
-box.addEventListener("input",updateCounter);
-updateCounter();
-
-/* TIME FORMAT */
-
-function formatTime(milliseconds){
-
-    let totalSeconds=Math.ceil(milliseconds/1000);
-    let minutes=Math.floor(totalSeconds/60);
-    let seconds=totalSeconds%60;
-
-    return minutes+":"+seconds.toString().padStart(2,"0");
-}
-
-/* START COOLDOWN */
-
-function startCooldown(until){
-
-    clearInterval(countdownInterval);
-
-    cooldownBox.style.display="block";
-    submitBtn.disabled=true;
-
-    function update(){
-
-        const remaining=until-Date.now();
-
-        if(remaining<=0){
-
-            clearInterval(countdownInterval);
-
-            localStorage.removeItem(COOLDOWN_KEY);
-            localStorage.removeItem(FIRST_MESSAGE_KEY);
-
-            cooldownBox.style.display="none";
-            submitBtn.disabled=false;
-            timer.innerText="2:00";
-
-            return;
-        }
-
-        timer.innerText=formatTime(remaining);
-    }
-
-    update();
-
-    countdownInterval=setInterval(update,250);
-}
-
-/* CHECK EXISTING COOLDOWN */
-
-function checkCooldown(){
-
-    const cooldownUntil=Number(
-        localStorage.getItem(COOLDOWN_KEY)
-    );
-
-    if(cooldownUntil && cooldownUntil>Date.now()){
-
-        startCooldown(cooldownUntil);
-        return true;
-    }
-
-    if(cooldownUntil){
-        localStorage.removeItem(COOLDOWN_KEY);
-    }
-
-    return false;
-}
-
-/* SEND FEEDBACK */
-
-async function send(){
-
-    if(checkCooldown()){
-        return;
-    }
-
-    let text=box.value.trim();
-
-    if(text===""){
-        alert("Please enter feedback.");
-        return;
-    }
-
-    if(containsBadWord(text)){
-
-        alert(
-            "🚫Your message contains a prohibited word. Please remove it and try again🚫."
-        );
-
-        return;
-    }
-
-    submitBtn.disabled=true;
-
-    try{
-
-        const response=await fetch(
-            WORKER_URL,
-            {
-                method:"POST",
-                headers:{
-                    "Content-Type":"application/json"
-                },
-                body:JSON.stringify({
-                    text:text
-                })
-            }
-        );
-
-        const result=await response.json();
-
-        if(!response.ok || !result.success){
-            throw new Error("Worker request failed.");
-        }
-
-        alert("Thank you for your feedback!✅");
-
-        box.value="";
-        count.innerText="0";
-
-        const now=Date.now();
-
-        const firstMessageTime=Number(
-            localStorage.getItem(FIRST_MESSAGE_KEY)
-        );
-
-        let triggerCooldown=false;
-
-        if(
-            firstMessageTime &&
-            now-firstMessageTime<=30000
-        ){
-            triggerCooldown=true;
-        }
-
-        if(triggerCooldown){
-
-            const cooldownUntil=Date.now()+(2*60*1000);
-
-            localStorage.setItem(
-                COOLDOWN_KEY,
-                cooldownUntil.toString()
-            );
-
-            localStorage.removeItem(FIRST_MESSAGE_KEY);
-
-            startCooldown(cooldownUntil);
-
-        }else{
-
-            localStorage.setItem(
-                FIRST_MESSAGE_KEY,
-                Date.now().toString()
-            );
-
-            submitBtn.disabled=false;
-
-            setTimeout(()=>{
-
-                const savedTime=Number(
-                    localStorage.getItem(FIRST_MESSAGE_KEY)
-                );
-
-                if(
-                    savedTime &&
-                    Date.now()-savedTime>=30000
-                ){
-                    localStorage.removeItem(FIRST_MESSAGE_KEY);
-                }
-
-            },30000);
-        }
-
-    }catch(error){
-
-        console.error(error);
-
-        alert(
-            "Could not send the feedback. Please try again❌."
-        );
-
-        submitBtn.disabled=false;
-    }
-}
-
-/* PAGE LOAD */
-
-checkCooldown();
-
-</script>
 
 </body>
 </html>
